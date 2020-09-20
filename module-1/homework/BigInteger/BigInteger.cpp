@@ -237,3 +237,15 @@ BigInteger::operator bool() const {
     return false;
   return true;
 }
+
+BigInteger BigInteger::operator+=(const BigInteger &other) {
+  BigInteger result = *this;
+  result = result + other;
+  return result;
+}
+
+BigInteger BigInteger::operator-=(const BigInteger &other) {
+  BigInteger result = *this;
+  result = result - other;
+  return result;
+}
