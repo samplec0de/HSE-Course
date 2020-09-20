@@ -39,6 +39,7 @@ class BigInteger {
   bool operator>=(const BigInteger &other) const;
   bool operator<(const BigInteger &other) const;
   bool operator<=(const BigInteger &other) const;
+  explicit operator bool() const;
 };
 
 std::ostream &operator<<(std::ostream &out, const BigInteger &bint);

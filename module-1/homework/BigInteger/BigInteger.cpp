@@ -231,3 +231,9 @@ bool BigInteger::operator<=(const BigInteger &other) const {
 bool BigInteger::operator!=(const BigInteger &other) const {
   return !(*this == other);
 }
+
+BigInteger::operator bool() const {
+  if (*this == 0)
+    return false;
+  return true;
+}
