@@ -128,15 +128,29 @@ BigInteger::BigInteger(const char *cstr) {
 }
 
 BigInteger BigInteger::operator+(const BigInteger &other) const {
-  BigInteger b = *this;
-  for (size_t i = 0; i < SIZE; ++i) {
-    b.digits[i] += other.digits[i];
-    if (b.digits[i] >= RADIX) {
-      b.digits[i + 1] += b.digits[i] / RADIX;
-      b.digits[i] %= RADIX;
+  if (!ltz && !other.ltz) {
+    BigInteger b = *this;
+    for (size_t i = 0; i < SIZE; ++i) {
+      b.digits[i] += other.digits[i];
+      if (b.digits[i] >= RADIX) {
+        b.digits[i + 1] += b.digits[i] / RADIX;
+        b.digits[i] %= RADIX;
+      }
     }
+    return b;
+  } else if (ltz && other.ltz) {
+    BigInteger a = *this;
+    BigInteger b = other;
+    a.ltz = false;
+    b.ltz = false;
+    return -(a + b);
+  } else if (ltz && !other.ltz) {
+    BigInteger a = *this;
+    return other - -a;
+  } else {
+    BigInteger a = other;
+    return *this - -a;
   }
-  return b;
 }
 
 BigInteger BigInteger::operator-(const BigInteger &other) const {
@@ -341,3 +355,9 @@ BigInteger BigInteger::operator++(int) {
   ++*this;
   return b;
 }
+//
+//void BigInteger::routine() {
+//  for (size_t i = 0; i < SIZE; ++i) {
+//    if ()
+//  }
+//}

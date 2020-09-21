@@ -19,7 +19,9 @@ const int SIZE = DIGITS_COUNT / 4;
 class BigInteger {
  private:
   unsigned short digits[SIZE];
+  size_t digitsCount = 0;
   void zeroize();
+  void routine();
   bool ltz = false;
  public:
   BigInteger();
