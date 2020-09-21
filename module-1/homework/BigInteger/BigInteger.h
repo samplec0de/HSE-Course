@@ -33,6 +33,7 @@ class BigInteger {
   friend std::istream &operator>>(std::istream &out, BigInteger &bint);
   BigInteger operator+(const BigInteger &other) const;
   BigInteger operator-(const BigInteger &other) const;
+  BigInteger& operator--();
   BigInteger operator-() const;
   BigInteger operator+=(const BigInteger &other);
   BigInteger operator-=(const BigInteger &other);

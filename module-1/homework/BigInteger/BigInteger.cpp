@@ -255,3 +255,40 @@ BigInteger BigInteger::operator-() const {
   result.ltz = !result.ltz;
   return result;
 }
+
+BigInteger &BigInteger::operator--() {
+  if (!ltz) {
+    if (digits[0] == 0) {
+      size_t i;
+      for (i = 1; i < SIZE; ++i) {
+        if (digits[i] > 0) {
+          break;
+        }
+      }
+      if (i == SIZE) {
+        digits[0] = 1;
+        ltz = true;
+      } else {
+        --digits[i];
+        for (i = i - 1; i > 0; --i) {
+          digits[i] += RADIX - 1;
+        }
+        digits[0] = RADIX - 1;
+      }
+    } else {
+      --digits[0];
+    }
+  } else {
+    ++digits[0];
+    short int i;
+    for (i = 0; i < SIZE; ++i) {
+      if (digits[i] >= RADIX) {
+        digits[i + 1] += digits[i] / RADIX;
+        digits[i] %= RADIX;
+      } else {
+        break;
+      }
+    }
+  }
+  return *this;
+}
