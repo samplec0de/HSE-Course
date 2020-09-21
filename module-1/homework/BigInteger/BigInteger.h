@@ -23,30 +23,30 @@ class BigInteger {
   bool ltz = false;
  public:
   BigInteger();
-  BigInteger(int n);
-  BigInteger(long long n);
-  BigInteger(const std::string &n);
-  BigInteger(const char *n);
-  void fillFromString(const std::string &n);
+  BigInteger(int);
+  BigInteger(long long);
+  BigInteger(const std::string&);
+  BigInteger(const char*);
+  void fillFromString(const std::string&);
   std::string toString() const;
-  friend std::ostream &operator<<(std::ostream &out, const BigInteger &bint);
-  friend std::istream &operator>>(std::istream &out, BigInteger &bint);
-  BigInteger operator+(const BigInteger &other) const;
-  BigInteger operator-(const BigInteger &other) const;
+  friend std::ostream &operator<<(std::ostream&, const BigInteger&);
+  friend std::istream &operator>>(std::istream&, BigInteger&);
+  BigInteger operator+(const BigInteger&) const;
+  BigInteger operator-(const BigInteger&) const;
   BigInteger& operator--();
   BigInteger operator-() const;
-  BigInteger operator+=(const BigInteger &other);
-  BigInteger operator-=(const BigInteger &other);
-  bool operator==(const BigInteger &other) const;
-  bool operator!=(const BigInteger &other) const;
-  bool operator>(const BigInteger &other) const;
-  bool operator>=(const BigInteger &other) const;
-  bool operator<(const BigInteger &other) const;
-  bool operator<=(const BigInteger &other) const;
+  BigInteger operator+=(const BigInteger&);
+  BigInteger operator-=(const BigInteger&);
+  bool operator==(const BigInteger&) const;
+  bool operator!=(const BigInteger&) const;
+  bool operator>(const BigInteger&) const;
+  bool operator>=(const BigInteger&) const;
+  bool operator<(const BigInteger&) const;
+  bool operator<=(const BigInteger&) const;
   explicit operator bool() const;
 };
 
-std::ostream &operator<<(std::ostream &out, const BigInteger &bint);
-std::istream &operator>>(std::ostream &in, BigInteger &bint);
+std::ostream &operator<<(std::ostream&, const BigInteger&);
+std::istream &operator>>(std::ostream&, BigInteger&);
 
 #endif //BIGINTEGER_BIGINTEGER_H
