@@ -280,7 +280,7 @@ BigInteger &BigInteger::operator--() {
     }
   } else {
     ++digits[0];
-    short int i;
+    size_t i;
     for (i = 0; i < SIZE; ++i) {
       if (digits[i] >= RADIX) {
         digits[i + 1] += digits[i] / RADIX;
@@ -297,4 +297,41 @@ BigInteger BigInteger::operator--(int) {
   BigInteger b = *this;
   --*this;
   return b;
+}
+
+BigInteger &BigInteger::operator++() {
+  if (!ltz) {
+    ++digits[0];
+    size_t i;
+    for (i = 0; i < SIZE; ++i) {
+      if (digits[i] >= RADIX) {
+        digits[i + 1] += digits[i] / RADIX;
+        digits[i] %= RADIX;
+      } else {
+        break;
+      }
+    }
+  } else {
+    if (digits[0] == 0) {
+      size_t i;
+      for (i = 1; i < SIZE; ++i) {
+        if (digits[i] > 0) {
+          break;
+        }
+      }
+      if (i == SIZE) {
+        digits[0] = 1;
+        ltz = true;
+      } else {
+        --digits[i];
+        for (i = i - 1; i > 0; --i) {
+          digits[i] += RADIX - 1;
+        }
+        digits[0] = RADIX - 1;
+      }
+    } else {
+      --digits[0];
+    }
+  }
+  return *this;
 }
