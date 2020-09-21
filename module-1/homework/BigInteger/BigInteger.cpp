@@ -385,3 +385,10 @@ BigInteger BigInteger::operator*(const BigInteger &other) const {
   results[0].ltz = newLtz;
   return results[0];
 }
+
+BigInteger BigInteger::operator*=(const BigInteger &other) {
+  BigInteger result = *this;
+  result = result * other;
+  *this = result;
+  return result;
+}
