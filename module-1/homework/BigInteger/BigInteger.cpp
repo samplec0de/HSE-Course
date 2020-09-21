@@ -220,8 +220,8 @@ bool BigInteger::operator>(const BigInteger &other) const {
     }
   }
   if (!ltz) {
-      if (lastNonZeroLeft == lastNonZeroRight)
-        return bigger;
+    if (lastNonZeroLeft == lastNonZeroRight)
+      return bigger;
     return lastNonZeroLeft > lastNonZeroRight;
   }
   if (lastNonZeroLeft == lastNonZeroRight)
@@ -255,12 +255,14 @@ BigInteger::operator bool() const {
 BigInteger BigInteger::operator+=(const BigInteger &other) {
   BigInteger result = *this;
   result = result + other;
+  *this = result;
   return result;
 }
 
 BigInteger BigInteger::operator-=(const BigInteger &other) {
   BigInteger result = *this;
   result = result - other;
+  *this = result;
   return result;
 }
 
@@ -355,9 +357,31 @@ BigInteger BigInteger::operator++(int) {
   ++*this;
   return b;
 }
-//
-//void BigInteger::routine() {
-//  for (size_t i = 0; i < SIZE; ++i) {
-//    if ()
-//  }
-//}
+
+BigInteger BigInteger::operator*(const BigInteger &other) const {
+  size_t digitsCountLeft = 0, digitsCountRight = 0;
+  bool newLtz = ((short int)(ltz) + other.ltz) % 2;
+  for (size_t i = 0; i < SIZE; ++i) {
+    if (digits[i] != 0) {
+      digitsCountLeft = i;
+    }
+    if (other.digits[i] != 0) {
+      digitsCountRight = i;
+    }
+  }
+  ++digitsCountLeft;
+  ++digitsCountRight;
+  BigInteger results[digitsCountRight];
+  for (size_t i = 0; i < digitsCountRight; ++i) {
+    for (size_t j = 0; j < digitsCountLeft; ++j) {
+      int cur = int(digits[j]) * other.digits[i] + results[i].digits[j + i];
+      results[i].digits[j + i] = cur % RADIX;
+      results[i].digits[j + i + 1] += cur / RADIX;
+    }
+  }
+  for (size_t i = 1; i < digitsCountRight; ++i) {
+    results[0] += results[i];
+  }
+  results[0].ltz = newLtz;
+  return results[0];
+}

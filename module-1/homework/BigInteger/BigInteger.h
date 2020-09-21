@@ -21,7 +21,6 @@ class BigInteger {
   unsigned short digits[SIZE];
   size_t digitsCount = 0;
   void zeroize();
-  void routine();
   bool ltz = false;
  public:
   BigInteger();
@@ -35,6 +34,7 @@ class BigInteger {
   friend std::istream &operator>>(std::istream&, BigInteger&);
   BigInteger operator+(const BigInteger&) const;
   BigInteger operator-(const BigInteger&) const;
+  BigInteger operator*(const BigInteger&) const;
   BigInteger& operator--();
   BigInteger operator--(int);
   BigInteger& operator++();
