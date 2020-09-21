@@ -249,3 +249,9 @@ BigInteger BigInteger::operator-=(const BigInteger &other) {
   result = result - other;
   return result;
 }
+
+BigInteger BigInteger::operator-() const {
+  BigInteger result = *this;
+  result.ltz = !result.ltz;
+  return result;
+}
