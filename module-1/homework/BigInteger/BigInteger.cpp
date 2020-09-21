@@ -292,3 +292,9 @@ BigInteger &BigInteger::operator--() {
   }
   return *this;
 }
+
+BigInteger BigInteger::operator--(int) {
+  BigInteger b = *this;
+  --*this;
+  return b;
+}

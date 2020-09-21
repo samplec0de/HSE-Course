@@ -34,6 +34,7 @@ class BigInteger {
   BigInteger operator+(const BigInteger&) const;
   BigInteger operator-(const BigInteger&) const;
   BigInteger& operator--();
+  BigInteger operator--(int);
   BigInteger operator-() const;
   BigInteger operator+=(const BigInteger&);
   BigInteger operator-=(const BigInteger&);
