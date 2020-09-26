@@ -392,3 +392,54 @@ BigInteger BigInteger::operator*=(const BigInteger &other) {
   *this = result;
   return result;
 }
+
+BigInteger BigInteger::operator/(const BigInteger &other) const {
+  BigInteger left = "0", right = MAX_VALUE_STR;
+  while (right - left > 1) {
+    BigInteger middle = left + (right - left).divide2();
+    if (other * middle > *this) {
+      right = middle;
+    } else {
+      left = middle;
+    }
+  }
+  return left;
+}
+
+BigInteger BigInteger::divide2() const {
+  short int lastDigitIndex = 0;
+  for (short int  i = 0; i < SIZE; ++i) {
+    if (digits[i] != 0) {
+      lastDigitIndex = i;
+    }
+  }
+
+  int buffer[SIZE];
+  short int bufferIndex = 0;
+  for (int & i : buffer) i = 0;
+  int currentInteger = 0;
+  while (lastDigitIndex >= 0) {
+    currentInteger = currentInteger * RADIX + digits[lastDigitIndex--];
+    if (currentInteger < 2) {
+      if (lastDigitIndex >= 0) {
+        currentInteger = currentInteger * RADIX + digits[lastDigitIndex--];
+      }
+    }
+    buffer[bufferIndex++] = currentInteger / 2;
+    currentInteger = currentInteger % 2;
+  }
+  return BigInteger(buffer, bufferIndex - 1);
+}
+
+BigInteger::BigInteger(int *reversedDigits, short int indexOther) {
+  zeroize();
+  short int index = 0;
+  for (; indexOther >= 0; --indexOther) {
+    digits[index++] = reversedDigits[indexOther];
+  }
+}
+
+BigInteger BigInteger::operator/=(const BigInteger &other) {
+  return *this = *this / other;
+}
+

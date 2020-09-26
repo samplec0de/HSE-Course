@@ -14,6 +14,7 @@
 const unsigned short RADIX = 1e4;
 const unsigned short RADIX_N_POW = log10(RADIX);
 const int DIGITS_COUNT = 1000;
+const std::string MAX_VALUE_STR = '1' + std::string(size_t(DIGITS_COUNT - 1), '0');
 const int SIZE = DIGITS_COUNT / 4;
 
 class BigInteger {
@@ -21,7 +22,9 @@ class BigInteger {
   unsigned short digits[SIZE];
   size_t digitsCount = 0;
   void zeroize();
+  BigInteger divide2() const;
   bool ltz = false;
+  explicit BigInteger(int*, short int);
  public:
   BigInteger();
   BigInteger(int);
@@ -35,6 +38,7 @@ class BigInteger {
   BigInteger operator+(const BigInteger&) const;
   BigInteger operator-(const BigInteger&) const;
   BigInteger operator*(const BigInteger&) const;
+  BigInteger operator/(const BigInteger&) const;
   BigInteger& operator--();
   BigInteger operator--(int);
   BigInteger& operator++();
@@ -43,6 +47,7 @@ class BigInteger {
   BigInteger operator+=(const BigInteger&);
   BigInteger operator-=(const BigInteger&);
   BigInteger operator*=(const BigInteger&);
+  BigInteger operator/=(const BigInteger&);
   bool operator==(const BigInteger&) const;
   bool operator!=(const BigInteger&) const;
   bool operator>(const BigInteger&) const;
