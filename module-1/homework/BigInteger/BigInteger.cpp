@@ -443,3 +443,10 @@ BigInteger BigInteger::operator/=(const BigInteger &other) {
   return *this = *this / other;
 }
 
+BigInteger BigInteger::operator%(const BigInteger &other) const {
+  return *this - (*this / other) * other;
+}
+
+BigInteger BigInteger::operator%=(const BigInteger &other) {
+  return *this = *this % other;
+}

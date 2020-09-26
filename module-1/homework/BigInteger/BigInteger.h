@@ -39,6 +39,7 @@ class BigInteger {
   BigInteger operator-(const BigInteger&) const;
   BigInteger operator*(const BigInteger&) const;
   BigInteger operator/(const BigInteger&) const;
+  BigInteger operator%(const BigInteger&) const;
   BigInteger& operator--();
   BigInteger operator--(int);
   BigInteger& operator++();
@@ -48,6 +49,7 @@ class BigInteger {
   BigInteger operator-=(const BigInteger&);
   BigInteger operator*=(const BigInteger&);
   BigInteger operator/=(const BigInteger&);
+  BigInteger operator%=(const BigInteger&);
   bool operator==(const BigInteger&) const;
   bool operator!=(const BigInteger&) const;
   bool operator>(const BigInteger&) const;
