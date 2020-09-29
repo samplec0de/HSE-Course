@@ -463,7 +463,8 @@ BigInteger::BigInteger(const BigInteger &bint) {
     digits[i] = bint.digits[i];
 }
 
-BigInteger BigInteger::operator=(const BigInteger &bint) {
+BigInteger& BigInteger::operator=(const BigInteger &bint) {
+  if (this == &bint) return *this;
   ltz = bint.ltz;
   for (size_t i = 0; i < SIZE; ++i)
     digits[i] = bint.digits[i];
