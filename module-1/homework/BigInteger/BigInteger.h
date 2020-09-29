@@ -23,7 +23,7 @@ class BigInteger {
   void zeroize();
   BigInteger divide2() const;
   bool ltz = false;
-  explicit BigInteger(int*, short int);
+  explicit BigInteger(const int*, short int);
  public:
   BigInteger();
   BigInteger(int);
@@ -42,9 +42,9 @@ class BigInteger {
   BigInteger operator/(const BigInteger&) const;
   BigInteger operator%(const BigInteger&) const;
   BigInteger& operator--();
-  BigInteger operator--(int);
+  const BigInteger operator--(int);
   BigInteger& operator++();
-  BigInteger operator++(int);
+  const BigInteger operator++(int);
   BigInteger operator-() const;
   BigInteger operator+=(const BigInteger&);
   BigInteger operator-=(const BigInteger&);

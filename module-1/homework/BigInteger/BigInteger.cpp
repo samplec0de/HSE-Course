@@ -7,7 +7,7 @@
 void print_digit(std::string &out, unsigned short digit) {
   std::string s = std::to_string(digit);
   while (s.size() < RADIX_N_POW) {
-    s = '0' + s;
+    s.insert(s.begin(), '0');
   }
   out += s;
 }
@@ -63,8 +63,8 @@ void BigInteger::fillFromString(const std::string &n) {
     ++to;
     ltz = true;
   }
-  for (int i = n.size() - 1; i >= to; --i) {
-    s = n[i] + s;
+  for (int i = int(n.size() - 1); i >= to; --i) {
+    s.insert(s.begin(), n[i]);
     if (s.size() == RADIX_N_POW) {
       digits[ind++] = std::stoi(s);
       s.clear();
@@ -117,8 +117,8 @@ BigInteger::BigInteger(const char *cstr) {
     ++to;
     ltz = true;
   }
-  for (int i = n.size() - 1; i >= to; --i) {
-    s = n[i] + s;
+  for (int i = int(n.size()) - 1; i >= to; --i) {
+    s.insert(s.begin(), n[i]);
     if (s.size() == RADIX_N_POW) {
       digits[ind++] = std::stoi(s);
       s.clear();
@@ -148,8 +148,7 @@ BigInteger BigInteger::operator+(const BigInteger &other) const {
     BigInteger a = *this;
     return other - -a;
   } else {
-    BigInteger a = other;
-    return *this - -a;
+    return *this - -other;
   }
 }
 
@@ -309,7 +308,7 @@ BigInteger &BigInteger::operator--() {
   return *this;
 }
 
-BigInteger BigInteger::operator--(int) {
+const BigInteger BigInteger::operator--(int) {
   BigInteger b = *this;
   --*this;
   return b;
@@ -352,7 +351,7 @@ BigInteger &BigInteger::operator++() {
   return *this;
 }
 
-BigInteger BigInteger::operator++(int) {
+const BigInteger BigInteger::operator++(int) {
   BigInteger b = *this;
   ++*this;
   return b;
@@ -430,10 +429,10 @@ BigInteger BigInteger::divide2() const {
     buffer[bufferIndex++] = currentInteger / 2;
     currentInteger = currentInteger % 2;
   }
-  return BigInteger(buffer, bufferIndex - 1);
+  return BigInteger(buffer, --bufferIndex);
 }
 
-BigInteger::BigInteger(int *reversedDigits, short int indexOther) {
+BigInteger::BigInteger(const int *reversedDigits, short int indexOther) {
   zeroize();
   short int index = 0;
   for (; indexOther >= 0; --indexOther) {
