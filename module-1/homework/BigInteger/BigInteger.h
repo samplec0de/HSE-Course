@@ -19,8 +19,7 @@ const int SIZE = DIGITS_COUNT / 4;
 
 class BigInteger {
  private:
-  unsigned short digits[SIZE];
-  size_t digitsCount = 0;
+  unsigned short * digits = new unsigned short [SIZE];
   void zeroize();
   BigInteger divide2() const;
   bool ltz = false;
@@ -31,6 +30,8 @@ class BigInteger {
   BigInteger(long long);
   BigInteger(const std::string&);
   BigInteger(const char*);
+  BigInteger(const BigInteger&);
+  ~BigInteger();
   void fillFromString(const std::string&);
   std::string toString() const;
   friend std::ostream &operator<<(std::ostream&, const BigInteger&);
@@ -50,6 +51,7 @@ class BigInteger {
   BigInteger operator*=(const BigInteger&);
   BigInteger operator/=(const BigInteger&);
   BigInteger operator%=(const BigInteger&);
+  BigInteger operator=(const BigInteger&);
   bool operator==(const BigInteger&) const;
   bool operator!=(const BigInteger&) const;
   bool operator>(const BigInteger&) const;

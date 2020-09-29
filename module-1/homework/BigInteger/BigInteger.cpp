@@ -452,3 +452,20 @@ BigInteger BigInteger::operator%(const BigInteger &other) const {
 BigInteger BigInteger::operator%=(const BigInteger &other) {
   return *this = *this % other;
 }
+
+BigInteger::~BigInteger() {
+  delete[] digits;
+}
+
+BigInteger::BigInteger(const BigInteger &bint) {
+  ltz = bint.ltz;
+  for (size_t i = 0; i < SIZE; ++i)
+    digits[i] = bint.digits[i];
+}
+
+BigInteger BigInteger::operator=(const BigInteger &bint) {
+  ltz = bint.ltz;
+  for (size_t i = 0; i < SIZE; ++i)
+    digits[i] = bint.digits[i];
+  return *this;
+}
