@@ -395,6 +395,7 @@ BigInteger BigInteger::operator*=(const BigInteger &other) {
 
 BigInteger BigInteger::operator/(const BigInteger &other) const {
   BigInteger left = "0", right = MAX_VALUE_STR;
+  bool newLtz = ((short int)(ltz) + other.ltz) % 2;
   while (right - left > 1) {
     BigInteger middle = left + (right - left).divide2();
     if (other * middle > *this) {
@@ -403,6 +404,7 @@ BigInteger BigInteger::operator/(const BigInteger &other) const {
       left = middle;
     }
   }
+  left.ltz = newLtz;
   return left;
 }
 
