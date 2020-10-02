@@ -393,18 +393,37 @@ BigInteger BigInteger::operator*=(const BigInteger &other) {
 }
 
 BigInteger BigInteger::operator/(const BigInteger &other) const {
-  BigInteger left = "0", right = MAX_VALUE_STR;
-  bool newLtz = ((short int)(ltz) + other.ltz) % 2;
-  while (right - left > 1) {
-    BigInteger middle = left + (right - left).divide2();
-    if (other * middle > *this) {
-      right = middle;
-    } else {
-      left = middle;
+  short int lastDigitIndex = 0;
+  for (short int  i = 0; i < SIZE; ++i) {
+    if (digits[i] != 0) {
+      lastDigitIndex = i;
     }
   }
-  left.ltz = newLtz;
-  return left;
+
+  int buffer[SIZE];
+  short int bufferIndex = 0;
+  for (int & i : buffer) i = 0;
+  BigInteger currentInteger = 0;
+  while (lastDigitIndex >= 0) {
+    currentInteger = currentInteger * RADIX + digits[lastDigitIndex--];
+    if (currentInteger < other && currentInteger != 0)
+      continue;
+
+    BigInteger left = 0, right = RADIX + 1;
+    while (right - left > 1) {
+      BigInteger middle = left + (right - left).divide2();
+      if (other * middle > currentInteger) {
+        right = middle;
+      } else {
+        left = middle;
+      }
+    }
+    buffer[bufferIndex++] = stoi(left.toString());
+    currentInteger = currentInteger - other * left;
+  }
+  BigInteger result(buffer, --bufferIndex);
+  result.ltz = ((short int)(ltz) + other.ltz) % 2;
+  return result;
 }
 
 BigInteger BigInteger::divide2() const {
