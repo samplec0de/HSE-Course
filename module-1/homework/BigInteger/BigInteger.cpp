@@ -17,21 +17,21 @@ std::string BigInteger::toString() const {
   if (ltz) {
     representation += '-';
   }
-  bool was = false;
+  bool was_digit = false;
   for (size_t i = SIZE - 1; i > 0; --i) {
     if (!digits[i]) {
-      if (was)
+      if (was_digit)
         print_digit(representation, digits[i]);
     } else {
-      if (was)
+      if (was_digit)
         print_digit(representation, digits[i]);
       else {
-        was = true;
+        was_digit = true;
         representation += std::to_string(digits[i]);
       }
     }
   }
-  if (was)
+  if (was_digit)
     print_digit(representation, digits[0]);
   else
     representation += std::to_string(digits[0]);
@@ -51,7 +51,8 @@ std::istream &operator>>(std::istream &in, BigInteger &bint) {
 }
 
 void BigInteger::zeroize() {
-  for (size_t i = 0; i < SIZE; ++i) digits[i] = 0;
+  for (size_t i = 0; i < SIZE; ++i)
+    digits[i] = 0;
 }
 
 void BigInteger::fillFromString(const std::string &n) {
@@ -70,7 +71,8 @@ void BigInteger::fillFromString(const std::string &n) {
       s.clear();
     }
   }
-  if (!s.empty()) digits[ind] = std::stoi(s);
+  if (!s.empty())
+    digits[ind] = std::stoi(s);
 }
 
 
@@ -124,84 +126,34 @@ BigInteger::BigInteger(const char *cstr) {
       s.clear();
     }
   }
-  if (!s.empty()) digits[ind] = std::stoi(s);
+  if (!s.empty())
+    digits[ind] = std::stoi(s);
 }
 
 BigInteger BigInteger::operator+(const BigInteger &other) const {
-  if (!ltz && !other.ltz) {
-    BigInteger b = *this;
-    for (size_t i = 0; i < SIZE; ++i) {
-      b.digits[i] += other.digits[i];
-      if (b.digits[i] >= RADIX) {
-        b.digits[i + 1] += b.digits[i] / RADIX;
-        b.digits[i] %= RADIX;
-      }
-    }
-    return b;
-  } else if (ltz && other.ltz) {
-    BigInteger a = *this;
-    BigInteger b = other;
-    a.ltz = false;
-    b.ltz = false;
-    return -(a + b);
-  } else if (ltz && !other.ltz) {
-    BigInteger a = *this;
-    return other - -a;
-  } else {
-    return *this - -other;
-  }
+  BigInteger b = *this;
+  return b += other;
 }
 
 BigInteger BigInteger::operator-(const BigInteger &other) const {
   BigInteger a = *this;
-  BigInteger b = other;
-  if (!a.ltz && !b.ltz) {
-    if (b <= a) {
-      for (size_t i = 0; i < SIZE; ++i) {
-        if (a.digits[i] < other.digits[i]) {
-          size_t j;
-          for (j = i + 1; j < SIZE; ++j) {
-            if (a.digits[j] > 0) {
-              --a.digits[j];
-              break;
-            }
-          }
-          for (j = j - 1; j > i; --j) {
-            a.digits[j] += RADIX - 1;
-          }
-          a.digits[i] += RADIX;
-        }
-        a.digits[i] -= other.digits[i];
-      }
-      return a;
-    } else {
-      BigInteger res = b - a;
-      res.ltz = true;
-      return res;
-    }
-  } else if (a.ltz && !b.ltz) {
-    a.ltz = false;
-    return b - a;
-  } else {
-    a.ltz = false;
-    b.ltz = false;
-    BigInteger result = a + b;
-    result.ltz = true;
-    return result;
-  }
+  return a -= other;
 }
 
 bool BigInteger::operator==(const BigInteger &other) const {
   for (size_t i = 0; i < SIZE; ++i)
-    if (digits[i] != other.digits[i])
+    if (ltz == other.ltz && digits[i] != other.digits[i])
       return false;
   return true;
 }
 
 bool BigInteger::operator>(const BigInteger &other) const {
-  if (ltz && !other.ltz) return false;
-  if (!ltz && other.ltz) return true;
-  if (*this == other) return false;
+  if (ltz && !other.ltz)
+    return false;
+  if (!ltz && other.ltz)
+    return true;
+  if (*this == other)
+    return false;
   bool bigger = false;
   size_t lastNonZeroLeft = 0;
   size_t lastNonZeroRight = 0;
@@ -229,7 +181,8 @@ bool BigInteger::operator>(const BigInteger &other) const {
 }
 
 bool BigInteger::operator<(const BigInteger &other) const {
-  if (*this == other) return false;
+  if (*this == other)
+    return false;
   return !(*this > other);
 }
 
@@ -251,18 +204,59 @@ BigInteger::operator bool() const {
   return true;
 }
 
-BigInteger BigInteger::operator+=(const BigInteger &other) {
-  BigInteger result = *this;
-  result = result + other;
-  *this = result;
-  return result;
+BigInteger& BigInteger::operator+=(const BigInteger &other) {
+  if ((!ltz && !other.ltz) || (ltz && other.ltz)) {
+    for (size_t i = 0; i < SIZE; ++i) {
+      digits[i] += other.digits[i];
+      if (digits[i] >= RADIX) {
+        digits[i + 1] += digits[i] / RADIX;
+        digits[i] %= RADIX;
+      }
+    }
+    if ((ltz && other.ltz))
+      ltz = true;
+    return *this;
+  } else if (ltz && !other.ltz) {
+    return *this = other - -*this;
+  } else {
+    return *this = *this - -other;
+  }
 }
 
-BigInteger BigInteger::operator-=(const BigInteger &other) {
-  BigInteger result = *this;
-  result = result - other;
-  *this = result;
-  return result;
+BigInteger& BigInteger::operator-=(const BigInteger &other) {
+  if (!ltz && !other.ltz) {
+    if (other <= *this) {
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (digits[i] < other.digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (digits[j] > 0) {
+              --digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            digits[j] += RADIX - 1;
+          }
+          digits[i] += RADIX;
+        }
+        digits[i] -= other.digits[i];
+      }
+      return *this;
+    } else {
+      return *this = -(other - *this);
+    }
+  } else if (ltz && !other.ltz) {
+    ltz = false;
+    *this = other + *this;
+    ltz = true;
+    return *this;
+  } else if (ltz && other.ltz) {
+    *this += -other;
+    return *this;
+  } else {
+    return *this += -other;
+  }
 }
 
 BigInteger BigInteger::operator-() const {
@@ -272,40 +266,7 @@ BigInteger BigInteger::operator-() const {
 }
 
 BigInteger &BigInteger::operator--() {
-  if (!ltz) {
-    if (digits[0] == 0) {
-      size_t i;
-      for (i = 1; i < SIZE; ++i) {
-        if (digits[i] > 0) {
-          break;
-        }
-      }
-      if (i == SIZE) {
-        digits[0] = 1;
-        ltz = true;
-      } else {
-        --digits[i];
-        for (i = i - 1; i > 0; --i) {
-          digits[i] += RADIX - 1;
-        }
-        digits[0] = RADIX - 1;
-      }
-    } else {
-      --digits[0];
-    }
-  } else {
-    ++digits[0];
-    size_t i;
-    for (i = 0; i < SIZE; ++i) {
-      if (digits[i] >= RADIX) {
-        digits[i + 1] += digits[i] / RADIX;
-        digits[i] %= RADIX;
-      } else {
-        break;
-      }
-    }
-  }
-  return *this;
+  return *this -= 1;
 }
 
 const BigInteger BigInteger::operator--(int) {
@@ -315,40 +276,7 @@ const BigInteger BigInteger::operator--(int) {
 }
 
 BigInteger &BigInteger::operator++() {
-  if (!ltz) {
-    ++digits[0];
-    size_t i;
-    for (i = 0; i < SIZE; ++i) {
-      if (digits[i] >= RADIX) {
-        digits[i + 1] += digits[i] / RADIX;
-        digits[i] %= RADIX;
-      } else {
-        break;
-      }
-    }
-  } else {
-    if (digits[0] == 0) {
-      size_t i;
-      for (i = 1; i < SIZE; ++i) {
-        if (digits[i] > 0) {
-          break;
-        }
-      }
-      if (i == SIZE) {
-        digits[0] = 1;
-        ltz = true;
-      } else {
-        --digits[i];
-        for (i = i - 1; i > 0; --i) {
-          digits[i] += RADIX - 1;
-        }
-        digits[0] = RADIX - 1;
-      }
-    } else {
-      --digits[0];
-    }
-  }
-  return *this;
+  return *this += 1;
 }
 
 const BigInteger BigInteger::operator++(int) {
@@ -385,7 +313,7 @@ BigInteger BigInteger::operator*(const BigInteger &other) const {
   return results[0];
 }
 
-BigInteger BigInteger::operator*=(const BigInteger &other) {
+BigInteger& BigInteger::operator*=(const BigInteger &other) {
   BigInteger result = *this;
   result = result * other;
   *this = result;
@@ -459,7 +387,7 @@ BigInteger::BigInteger(const int *reversedDigits, short int indexOther) {
   }
 }
 
-BigInteger BigInteger::operator/=(const BigInteger &other) {
+BigInteger& BigInteger::operator/=(const BigInteger &other) {
   return *this = *this / other;
 }
 
@@ -467,7 +395,7 @@ BigInteger BigInteger::operator%(const BigInteger &other) const {
   return *this - (*this / other) * other;
 }
 
-BigInteger BigInteger::operator%=(const BigInteger &other) {
+BigInteger& BigInteger::operator%=(const BigInteger &other) {
   return *this = *this % other;
 }
 

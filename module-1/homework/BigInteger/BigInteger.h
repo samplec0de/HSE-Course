@@ -18,12 +18,6 @@ const std::string MAX_VALUE_STR = '1' + std::string(size_t(DIGITS_COUNT - 1), '0
 const int SIZE = DIGITS_COUNT / 4;
 
 class BigInteger {
- private:
-  unsigned short * digits = new unsigned short [SIZE];
-  void zeroize();
-  BigInteger divide2() const;
-  bool ltz = false;
-  explicit BigInteger(const int*, short int);
  public:
   BigInteger();
   BigInteger(int);
@@ -31,34 +25,51 @@ class BigInteger {
   BigInteger(const std::string&);
   BigInteger(const char*);
   BigInteger(const BigInteger&);
+
   ~BigInteger();
+
   void fillFromString(const std::string&);
   std::string toString() const;
+
   friend std::ostream &operator<<(std::ostream&, const BigInteger&);
   friend std::istream &operator>>(std::istream&, BigInteger&);
+
   BigInteger operator+(const BigInteger&) const;
   BigInteger operator-(const BigInteger&) const;
   BigInteger operator*(const BigInteger&) const;
   BigInteger operator/(const BigInteger&) const;
   BigInteger operator%(const BigInteger&) const;
+
   BigInteger& operator--();
   const BigInteger operator--(int);
+
   BigInteger& operator++();
   const BigInteger operator++(int);
+
   BigInteger operator-() const;
-  BigInteger operator+=(const BigInteger&);
-  BigInteger operator-=(const BigInteger&);
-  BigInteger operator*=(const BigInteger&);
-  BigInteger operator/=(const BigInteger&);
-  BigInteger operator%=(const BigInteger&);
+
+  BigInteger& operator+=(const BigInteger&);
+  BigInteger& operator-=(const BigInteger&);
+  BigInteger& operator*=(const BigInteger&);
+  BigInteger& operator/=(const BigInteger&);
+  BigInteger& operator%=(const BigInteger&);
+
   BigInteger& operator=(const BigInteger&);
+
   bool operator==(const BigInteger&) const;
   bool operator!=(const BigInteger&) const;
   bool operator>(const BigInteger&) const;
   bool operator>=(const BigInteger&) const;
   bool operator<(const BigInteger&) const;
   bool operator<=(const BigInteger&) const;
+
   explicit operator bool() const;
+ private:
+  unsigned short * digits = new unsigned short [SIZE];
+  void zeroize();
+  BigInteger divide2() const;
+  bool ltz = false;
+  explicit BigInteger(const int*, short int);
 };
 
 std::ostream &operator<<(std::ostream&, const BigInteger&);

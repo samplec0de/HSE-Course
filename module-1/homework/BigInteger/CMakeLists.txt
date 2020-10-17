@@ -4,6 +4,8 @@ include(GoogleTest)
 
 project("BigInteger")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -40,5 +42,11 @@ endif()
 
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(biginteger tests.cpp biginteger.h biginteger.cpp)
-target_link_libraries(biginteger gtest_main)
+#target_link_libraries(biginteger gtest_main)
+target_link_libraries(biginteger PRIVATE gtest_main)
 add_test(NAME biginteger_test COMMAND biginteger)
+
+add_library(sanitizers INTERFACE)
+target_compile_options(sanitizers INTERFACE -fsanitize=address,undefined)
+target_link_options(sanitizers INTERFACE -fsanitize=address,undefined)
+target_link_libraries(biginteger PRIVATE sanitizers)
