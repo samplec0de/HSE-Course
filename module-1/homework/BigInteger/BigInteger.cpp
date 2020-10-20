@@ -205,7 +205,7 @@ BigInteger::operator bool() const {
 }
 
 BigInteger& BigInteger::operator+=(const BigInteger &other) {
-  if ((!ltz && !other.ltz) || (ltz && other.ltz)) {
+  if ((!ltz && !other.ltz) || (ltz && other.ltz)) { // Оба операнда одного знака
     for (size_t i = 0; i < SIZE; ++i) {
       digits[i] += other.digits[i];
       if (digits[i] >= RADIX) {
@@ -213,12 +213,50 @@ BigInteger& BigInteger::operator+=(const BigInteger &other) {
         digits[i] %= RADIX;
       }
     }
-    if ((ltz && other.ltz))
+    if (ltz && other.ltz) // Оба операнда отрицательные
       ltz = true;
     return *this;
-  } else if (ltz && !other.ltz) {
-    return *this = other - -*this;
-  } else {
+  } else if (ltz && !other.ltz) { // Левый операнд отрицательный, правый положительный
+    if (greaterByAbsoluteValue(other, *this)) {
+      // тут надо из other вычесть this, без доп памяти никак
+      BigInteger result = other;
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (result.digits[i] < digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (result.digits[j] > 0) {
+              --result.digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            result.digits[j] += RADIX - 1;
+          }
+          result.digits[i] += RADIX;
+        }
+        result.digits[i] -= digits[i];
+      }
+      return *this = result;
+    } else {
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (digits[i] < other.digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (digits[j] > 0) {
+              --digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            digits[j] += RADIX - 1;
+          }
+          digits[i] += RADIX;
+        }
+        digits[i] -= other.digits[i];
+      }
+      return *this;
+    }
+  } else { // Левый операнд положительный, правый отрицательный
     return *this = *this - -other;
   }
 }
@@ -415,4 +453,26 @@ BigInteger& BigInteger::operator=(const BigInteger &bint) {
   for (size_t i = 0; i < SIZE; ++i)
     digits[i] = bint.digits[i];
   return *this;
+}
+
+bool greaterByAbsoluteValue(const BigInteger& a, const BigInteger& b) {
+  bool bigger = false;
+  size_t lastNonZeroLeft = 0;
+  size_t lastNonZeroRight = 0;
+  for (size_t i = 0; i < SIZE; ++i) {
+    if (a.digits[i]) lastNonZeroLeft = i;
+    if (b.digits[i]) lastNonZeroRight = i;
+  }
+  if (lastNonZeroLeft == lastNonZeroRight) {
+    for (short int i = lastNonZeroLeft; i >= 0; --i) {
+      if (a.digits[i] > b.digits[i]) {
+        bigger = true;
+      } else if (a.digits[i] < b.digits[i]) {
+        break;
+      }
+    }
+  }
+  if (lastNonZeroLeft == lastNonZeroRight)
+    return bigger;
+  return lastNonZeroLeft > lastNonZeroRight;
 }
