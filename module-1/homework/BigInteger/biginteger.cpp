@@ -14,7 +14,7 @@ void print_digit(std::string &out, unsigned short digit) {
 
 std::string BigInteger::toString() const {
   std::string representation;
-  if (ltz) {
+  if (isNegative) {
     representation += '-';
   }
   bool was_digit = false;
@@ -62,7 +62,7 @@ void BigInteger::fillFromString(const std::string &n) {
   int to = 0;
   if (n[to] == '-') {
     ++to;
-    ltz = true;
+    isNegative = true;
   }
   for (int i = int(n.size() - 1); i >= to; --i) {
     s.insert(s.begin(), n[i]);
@@ -79,7 +79,7 @@ void BigInteger::fillFromString(const std::string &n) {
 BigInteger::BigInteger(int n) {
   zeroize();
   if (n < 0) {
-    ltz = true;
+    isNegative = true;
     n = -n;
   }
   size_t ind = 0;
@@ -92,7 +92,7 @@ BigInteger::BigInteger(int n) {
 BigInteger::BigInteger(long long n) {
   zeroize();
   if (n < 0) {
-    ltz = true;
+    isNegative = true;
     n = -n;
   }
   size_t ind = 0;
@@ -117,7 +117,7 @@ BigInteger::BigInteger(const char *cstr) {
   int to = 0;
   if (n[to] == '-') {
     ++to;
-    ltz = true;
+    isNegative = true;
   }
   for (int i = int(n.size()) - 1; i >= to; --i) {
     s.insert(s.begin(), n[i]);
@@ -142,15 +142,15 @@ BigInteger BigInteger::operator-(const BigInteger &other) const {
 
 bool BigInteger::operator==(const BigInteger &other) const {
   for (size_t i = 0; i < SIZE; ++i)
-    if (ltz == other.ltz && digits[i] != other.digits[i])
+    if (isNegative == other.isNegative && digits[i] != other.digits[i])
       return false;
   return true;
 }
 
 bool BigInteger::operator>(const BigInteger &other) const {
-  if (ltz && !other.ltz)
+  if (isNegative && !other.isNegative)
     return false;
-  if (!ltz && other.ltz)
+  if (!isNegative && other.isNegative)
     return true;
   if (*this == other)
     return false;
@@ -170,7 +170,7 @@ bool BigInteger::operator>(const BigInteger &other) const {
       }
     }
   }
-  if (!ltz) {
+  if (!isNegative) {
     if (lastNonZeroLeft == lastNonZeroRight)
       return bigger;
     return lastNonZeroLeft > lastNonZeroRight;
@@ -205,7 +205,7 @@ BigInteger::operator bool() const {
 }
 
 BigInteger& BigInteger::operator+=(const BigInteger &other) {
-  if ((!ltz && !other.ltz) || (ltz && other.ltz)) { // Оба операнда одного знака
+  if ((!isNegative && !other.isNegative) || (isNegative && other.isNegative)) { // Оба операнда одного знака
     for (size_t i = 0; i < SIZE; ++i) {
       digits[i] += other.digits[i];
       if (digits[i] >= RADIX) {
@@ -213,10 +213,10 @@ BigInteger& BigInteger::operator+=(const BigInteger &other) {
         digits[i] %= RADIX;
       }
     }
-    if (ltz && other.ltz) // Оба операнда отрицательные
-      ltz = true;
+    if (isNegative && other.isNegative) // Оба операнда отрицательные
+      isNegative = true;
     return *this;
-  } else if (ltz && !other.ltz) { // Левый операнд отрицательный, правый положительный
+  } else if (isNegative && !other.isNegative) { // Левый операнд отрицательный, правый положительный
     if (greaterByAbsoluteValue(other, *this)) {
       // тут надо из other вычесть this, без доп памяти никак
       BigInteger result = other;
@@ -300,7 +300,7 @@ BigInteger& BigInteger::operator+=(const BigInteger &other) {
 }
 
 BigInteger& BigInteger::operator-=(const BigInteger &other) {
-  if (!ltz && !other.ltz) {
+  if (!isNegative && !other.isNegative) {
     if (other <= *this) {
       for (size_t i = 0; i < SIZE; ++i) {
         if (digits[i] < other.digits[i]) {
@@ -338,14 +338,14 @@ BigInteger& BigInteger::operator-=(const BigInteger &other) {
         }
         result.digits[i] -= digits[i];
       }
-      result.ltz = true;
+      result.isNegative = true;
       return *this = result;
     }
-  } else if (ltz && other.ltz) { // Оба отрицательные, к *this надо прибавить |other|
+  } else if (isNegative && other.isNegative) { // Оба отрицательные, к *this надо прибавить |other|
     if (greaterByAbsoluteValue(other, *this)) { // Надо из |other| вычесть *this
       // Надо вычесть из other *this, никак без доп памяти
       BigInteger result = other;
-      result.ltz = false;
+      result.isNegative = false;
       for (size_t i = 0; i < SIZE; ++i) {
         if (result.digits[i] < digits[i]) {
           size_t j;
@@ -383,10 +383,10 @@ BigInteger& BigInteger::operator-=(const BigInteger &other) {
       }
       return *this;
     }
-  } else if (ltz && !other.ltz) { // Левый отрицательный, правый положительный
-    ltz = false;
+  } else if (isNegative && !other.isNegative) { // Левый отрицательный, правый положительный
+    isNegative = false;
     *this += other;
-    ltz = true;
+    isNegative = true;
     return *this;
   } else { // Левый положительный, правый отрицательный
     // Нужно сложить абсолютные значения
@@ -403,7 +403,7 @@ BigInteger& BigInteger::operator-=(const BigInteger &other) {
 
 BigInteger BigInteger::operator-() const {
   BigInteger result = *this;
-  result.ltz = !result.ltz;
+  result.isNegative = !result.isNegative;
   return result;
 }
 
@@ -429,7 +429,7 @@ const BigInteger BigInteger::operator++(int) {
 
 BigInteger BigInteger::operator*(const BigInteger &other) const {
   size_t digitsCountLeft = 0, digitsCountRight = 0;
-  bool newLtz = ((short int)(ltz) + other.ltz) % 2;
+  bool newLtz = ((short int)(isNegative) + other.isNegative) % 2;
   for (size_t i = 0; i < SIZE; ++i) {
     if (digits[i] != 0) {
       digitsCountLeft = i;
@@ -451,7 +451,7 @@ BigInteger BigInteger::operator*(const BigInteger &other) const {
   for (size_t i = 1; i < digitsCountRight; ++i) {
     results[0] += results[i];
   }
-  results[0].ltz = newLtz;
+  results[0].isNegative = newLtz;
   return results[0];
 }
 
@@ -494,7 +494,7 @@ BigInteger BigInteger::operator/(const BigInteger &other) const {
     currentInteger = currentInteger - other * left;
   }
   BigInteger result(buffer, --bufferIndex);
-  result.ltz = ((short int)(ltz) + other.ltz) % 2;
+  result.isNegative = ((short int)(isNegative) + other.isNegative) % 2;
   return result;
 }
 
@@ -548,14 +548,14 @@ BigInteger::~BigInteger() {
 }
 
 BigInteger::BigInteger(const BigInteger &bint) {
-  ltz = bint.ltz;
+  isNegative = bint.isNegative;
   for (size_t i = 0; i < SIZE; ++i)
     digits[i] = bint.digits[i];
 }
 
 BigInteger& BigInteger::operator=(const BigInteger &bint) {
   if (this == &bint) return *this;
-  ltz = bint.ltz;
+  isNegative = bint.isNegative;
   for (size_t i = 0; i < SIZE; ++i)
     digits[i] = bint.digits[i];
   return *this;

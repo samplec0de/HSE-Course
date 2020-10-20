@@ -69,7 +69,7 @@ class BigInteger {
   unsigned short * digits = new unsigned short [SIZE];
   void zeroize();
   BigInteger divide2() const;
-  bool ltz = false;
+  bool isNegative = false;
   explicit BigInteger(const int*, short int);
 };
 
