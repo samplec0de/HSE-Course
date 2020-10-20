@@ -474,14 +474,16 @@ BigInteger BigInteger::operator/(const BigInteger &other) const {
   short int bufferIndex = 0;
   for (int & i : buffer) i = 0;
   BigInteger currentInteger = 0;
+  BigInteger left = 0, right = RADIX + 1, middle;
   while (lastDigitIndex >= 0) {
     currentInteger = currentInteger * RADIX + digits[lastDigitIndex--];
     if (currentInteger < other && currentInteger != 0)
       continue;
 
-    BigInteger left = 0, right = RADIX + 1, middle;
+    left = 0;
+    right = RADIX + 1;
     while (right - left > 1) {
-      BigInteger middle = left + (right - left).divide2();
+      middle = left + (right - left).divide2();
       if (other * middle > currentInteger) {
         right = middle;
       } else {
