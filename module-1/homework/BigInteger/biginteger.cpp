@@ -479,7 +479,7 @@ BigInteger BigInteger::operator/(const BigInteger &other) const {
     if (currentInteger < other && currentInteger != 0)
       continue;
 
-    BigInteger left = 0, right = RADIX + 1;
+    BigInteger left = 0, right = RADIX + 1, middle;
     while (right - left > 1) {
       BigInteger middle = left + (right - left).divide2();
       if (other * middle > currentInteger) {
