@@ -320,18 +320,84 @@ BigInteger& BigInteger::operator-=(const BigInteger &other) {
       }
       return *this;
     } else {
-      return *this = -(other - *this);
+      // нужно из other вычесть *this, без доп памяти никак
+      BigInteger result = other;
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (result.digits[i] < digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (result.digits[j] > 0) {
+              --result.digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            result.digits[j] += RADIX - 1;
+          }
+          result.digits[i] += RADIX;
+        }
+        result.digits[i] -= digits[i];
+      }
+      result.ltz = true;
+      return *this = result;
     }
-  } else if (ltz && !other.ltz) {
+  } else if (ltz && other.ltz) { // Оба отрицательные, к *this надо прибавить |other|
+    if (greaterByAbsoluteValue(other, *this)) { // Надо из |other| вычесть *this
+      // Надо вычесть из other *this, никак без доп памяти
+      BigInteger result = other;
+      result.ltz = false;
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (result.digits[i] < digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (result.digits[j] > 0) {
+              --result.digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            result.digits[j] += RADIX - 1;
+          }
+          result.digits[i] += RADIX;
+        }
+        result.digits[i] -= digits[i];
+      }
+      return *this = result;
+    } else {
+      // Надо из this вычесть other
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (digits[i] < other.digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (digits[j] > 0) {
+              --digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            digits[j] += RADIX - 1;
+          }
+          digits[i] += RADIX;
+        }
+        digits[i] -= other.digits[i];
+      }
+      return *this;
+    }
+  } else if (ltz && !other.ltz) { // Левый отрицательный, правый положительный
     ltz = false;
-    *this = other + *this;
+    *this += other;
     ltz = true;
     return *this;
-  } else if (ltz && other.ltz) {
-    *this += -other;
+  } else { // Левый положительный, правый отрицательный
+    // Нужно сложить абсолютные значения
+    for (size_t i = 0; i < SIZE; ++i) {
+      digits[i] += other.digits[i];
+      if (digits[i] >= RADIX) {
+        digits[i + 1] += digits[i] / RADIX;
+        digits[i] %= RADIX;
+      }
+    }
     return *this;
-  } else {
-    return *this += -other;
   }
 }
 
