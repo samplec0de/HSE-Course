@@ -2,7 +2,7 @@
 // Created by Андрей Москалёв on 13.09.2020.
 //
 
-#include "BigInteger.h"
+#include "biginteger.h"
 
 void print_digit(std::string &out, unsigned short digit) {
   std::string s = std::to_string(digit);
