@@ -257,7 +257,45 @@ BigInteger& BigInteger::operator+=(const BigInteger &other) {
       return *this;
     }
   } else { // Левый операнд положительный, правый отрицательный
-    return *this = *this - -other;
+    if (greaterByAbsoluteValue(*this, other)) {
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (digits[i] < other.digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (digits[j] > 0) {
+              --digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            digits[j] += RADIX - 1;
+          }
+          digits[i] += RADIX;
+        }
+        digits[i] -= other.digits[i];
+      }
+      return *this;
+    } else {
+      // тут надо из other вычесть this, без доп памяти никак
+      BigInteger result = other;
+      for (size_t i = 0; i < SIZE; ++i) {
+        if (result.digits[i] < digits[i]) {
+          size_t j;
+          for (j = i + 1; j < SIZE; ++j) {
+            if (result.digits[j] > 0) {
+              --result.digits[j];
+              break;
+            }
+          }
+          for (j = j - 1; j > i; --j) {
+            result.digits[j] += RADIX - 1;
+          }
+          result.digits[i] += RADIX;
+        }
+        result.digits[i] -= digits[i];
+      }
+      return *this = result;
+    }
   }
 }
 
