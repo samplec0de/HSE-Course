@@ -458,8 +458,7 @@ BigInteger BigInteger::operator*(const BigInteger &other) const {
 BigInteger& BigInteger::operator*=(const BigInteger &other) {
   BigInteger result = *this;
   result = result * other;
-  *this = result;
-  return result;
+  return *this = result;
 }
 
 BigInteger BigInteger::operator/(const BigInteger &other) const {
