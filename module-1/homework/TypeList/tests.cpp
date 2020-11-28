@@ -50,7 +50,6 @@ TEST(Erase, Test2) {
 
 TEST(EraseAll, Test1) {
     typedef TypeList<int, TypeList<int, NullType>> actual;
-    
     testing::StaticAssertTypeEq<EraseAll<actual, int>::NewTypeList, NullType>();
 }
 
@@ -112,6 +111,6 @@ TEST(Replace, Test2) {
 // TEST(TypeAt, Test1) {
 //     typedef TypeList<int, TypeList<double, NullType>> actual;
 //     typedef double expected;
-    
+//
 //     ASSERT_TRUE(std::is_same<TypeAt<actual, 1>::TargetType, expected>::value);
 // }
